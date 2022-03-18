@@ -5,6 +5,6 @@ const { Renderer } = require('./classes/renderer');
 let renderer = Renderer;
 
 // Espera al evento ready para lanzar el "renderizador"...
-app.on('ready', () => {
+app.whenReady().then(() => {
     renderer = new Renderer();
 });

@@ -1,29 +1,30 @@
 const { createWriteStream, mkdirSync } = require('fs');
 const { homedir } = require('os');
+const { join } = require('path');
 
 function write(buffer) {
     return new Promise((resolve, reject) => {
 
         // Crea una instancia de Date para el nombre del archivo.
         const date = new Date();
-        const path = `${ homedir() }/scs/${ date.toISOString() }.png`;
+        const path = join(homedir(), 'dss');
 
         // Crea un WriteStream para almacenar el archivo.
-        const out = createWriteStream(path);
+        const out = createWriteStream(join(path, date.getTime() + '.png'));
 
         // Captura el evento de error en el WriteStream.
         out.on('error', (err) => {
 
-            // Si el directorio no existe (scs - "SCreenshotS")
+            // Si el directorio no existe
             if (err.code === 'ENOENT') {
 
-                console.log(`No existe el directorio ${homedir()}/cps...`)
+                console.log(`No existe el directorio ${path}...`)
                 // Crea el el directorio scs.
                 /* 
                     Proceso síncrono. Evita que se realicen más capturas hasta que no
                     se haya creado el directorio.
                  */
-                mkdirSync(`${homedir()}/scs`);
+                mkdirSync(path);
 
                 // Vuelve a intentar escribir de nuevo.
                 write(buffer)
@@ -51,8 +52,9 @@ function write(buffer) {
             out.destroy();
         })
 
-        // Escribe el buffer en el WriteStream.
+        // Escribe el buffer y cierra el WriteStream.
         out.write(buffer);
+        out.close();
 
     })
 };
